@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta name="author" content="Rein Appeldoorn">
+
+    <title>Camel race - Let's race some camels!</title>
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/camel-race.css" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="site-wrapper">
+
+    <div class="site-wrapper-inner">
+
+        <div class="cover-container" id="app">
+
+            <div class="masthead clearfix">
+                <div class="inner">
+                    <h3 class="masthead-brand">Camel Race!</h3>
+                    <nav>
+                        <ul class="nav masthead-nav">
+                            <li><a href="#" @click="clearPlayers">Clear players</a></li>
+                            <li><a href="#" @click="restartGame">Restart game</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+
+            <div v-if="winner">
+                <h1 class="cover-heading">{{winner.name}} has won!</h1>
+                <p class="lead">
+                  <a href="#" class="btn btn-lg btn-default" @click="restartGame">Restart game</a>
+                </p>
+            </div>
+            <div class="inner cover">
+                <div v-for="(player, origin, idx) in players" class="player">
+                    <transition name="fade" mode="out-in">
+                        <div class="lastScore"
+                              :style="{color: getColor(idx)}"
+                              :key="player.lastEvent.time"
+                              v-text="player.lastEvent.num_points"></div>
+                    </transition>
+                    <div class="info">
+                        <span class="name" v-text="player.name"></span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated"
+                             role="progressbar"
+                             :style="{width: getPercentage(player.score) + '%', backgroundColor: getColor(idx)}"
+                             :aria-valuenow="player.score"
+                             aria-valuemin="0"
+                             :aria-valuemax="maxScore"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mastfoot">
+                <div class="inner">
+                    <p>Camel race, by <a href="mailto:reinappeldoorn@gmail.com">Rein Appeldoorn</a></p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="js/jquery-3.2.1.min.js"></script>
+<script src="js/tether.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/vue.min.js"></script>
+<script>
+var app = new Vue({
+  el: '#app',
+  data: {
+    message: 'Hello Vue!',
+    players: {},
+    maxScore: 10
+  },
+  computed: {
+    winner () {
+      for (origin in this.players) {
+        if (this.players[origin].score >= this.maxScore) {
+          return this.players[origin]
+        }
+      }
+      return null
+    }
+  },
+  created () {
+    var app = this
+
+    // Connect to Web Socket
+    ws = new WebSocket("ws://localhost:3000/")
+    ws.onmessage = function(e) {
+      var msg = JSON.parse(e.data);
+      var origin = msg.origin.ip + ":" + msg.origin.port
+
+      if (msg.event.type == "sensor_reading") {
+        if (!(origin in app.players)) {
+          app.$set(app.players, origin, {
+            score: 0,
+            name: 'Player ' + (Object.keys(app.players).length + 1),
+            lastEvent: null
+          })
+        }
+
+        // Overwrite the timestamp and trigger the event callback
+        msg.event.data.time = new Date()
+        app.sensorReadingCallback(origin, msg.event.data)
+      } else if (msg.event.type == "restart") {
+        app.restartGame()
+      } else if (msg.event.type == "clear_players") {
+        app.clearPlayers()
+      } else {
+        console.log("Unsupported event", msg.event)
+      }
+    };
+  },
+  methods: {
+    getColor (idx) {
+      var index = idx % 5
+      var colors = ['#5cb85c', '#5bc0de', '#f0ad4e', '#d9534f', '#0275d8']
+      return colors[index]
+    },
+    getPercentage (score) {
+      return parseInt(parseFloat(score) / this.maxScore * 100)
+    },
+    sensorReadingCallback (origin, e) {
+      if (!this.winner) {
+        this.players[origin].score += e.num_points
+        this.players[origin].lastEvent = e
+      }
+    },
+    restartGame () {
+      for (origin in this.players) {
+        this.players[origin].score = 0
+      }
+    },
+    clearPlayers () {
+      this.players = {}
+    },
+  }
+})
+</script>
+
+
+</body>
+</html>
+
+
