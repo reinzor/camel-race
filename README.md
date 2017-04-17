@@ -1,6 +1,9 @@
 # Camel race
 
-![](img/ui_animation.gif)
+User interface animation   |  Client play illustration
+:-------------------------:|:-------------------------:
+![](img/ui_animation.gif)  |  ![](img/illustration.gif)
+
 
 # The system
 
@@ -11,6 +14,13 @@
 - Wooden casing
 
 ## n x Raspberry Pi zero W (Clients)
+
+![](img/ee.jpg)
+
+Holes 1             |  Holes2
+:------------------:|:---------------------:
+![](img/holes.jpg)  |  ![](img/holes2.jpeg)
+
 - Websocket client for the gpio break beam sensors (python)
 - Wooden casing
 - 5 x IR break beam sensor
