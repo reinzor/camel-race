@@ -63,7 +63,7 @@
 
             <div class="mastfoot">
                 <div class="inner">
-                    <p>Camel race, by <a href="mailto:reinappeldoorn@gmail.com">Rein Appeldoorn</a></p>
+                    <p>Camel race, by <a href="mailto:info@baasvanhorstaandemaas.nl">Baas van Horst aan de Maas</a></p>
                 </div>
             </div>
 
@@ -115,6 +115,7 @@ var app = new Vue({
     ws.onmessage = function(e) {
       var msg = JSON.parse(e.data);
       var origin = msg.origin.ip + ":" + msg.origin.port
+      console.log(origin, msg)
 
       if (msg.event.type == "sensor_reading") {
         if (!(origin in app.players)) {
