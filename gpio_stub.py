@@ -9,7 +9,7 @@ _callbacks = []
 
 def gpio_thread():
     while True:
-        time.sleep(3)
+        time.sleep(random.random() * 4)  # Sleep somewhere between 0 ... 4
         gpio_pin, callback = random.choice(_callbacks)
         callback(gpio_pin)
 

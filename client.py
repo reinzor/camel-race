@@ -9,10 +9,6 @@ import subprocess
 import re
 import websocket
 
-try:
-    import RPi.GPIO as GPIO
-except ImportError as e:
-    from gpio_stub import GPIO
 
 # Detector map that holds the BCM GPIO pin to num_points mapping
 DETECTOR_MAP = {
@@ -29,9 +25,10 @@ class Client:
         self._websocket_address = websocket_address
         self._bounce_time = bounce_time
 
-        self._setup_gpio()
         self._get_websocket_connection()
         self._status = {}
+
+        self._setup_gpio()
 
     # Create the websocket connection
     def _get_websocket_connection(self):
@@ -112,7 +109,17 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Camel race client")
     parser.add_argument("--websocket_address", help='Websocket server address', default='ws://localhost:3000', type=str)
     parser.add_argument("--bounce_time", help="GPIO bounce time in ms for sensor trigger", default=500, type=int)
+    parser.add_argument("--stub", action="store_true")
     args = parser.parse_args()
+
+    if args.stub:
+        from gpio_stub import GPIO
+    else:
+        try:
+            import RPi.GPIO as GPIO
+        except ImportError as e:
+            print "Failed to import Raspberry PI GPIO, try running with --stub on a non-raspberry pi platform"
+            sys.exit(1)
 
     c = Client(args.websocket_address, args.bounce_time)
     c.spin()
