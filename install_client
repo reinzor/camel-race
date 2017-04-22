@@ -1,4 +1,12 @@
 #!/bin/bash 
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 sudo apt install python-websocket
 
+# Copy the app
+SERVICE_NAME=camel-race-client
+echo "Make sure that we start the app on startup"
+sudo cp $DIR/$SERVICE_NAME.service /etc/systemd/system/
+sudo bash -c "echo 'ExecStart=/usr/bin/python -u $DIR/client.py --stub' >> /etc/systemd/system/$SERVICE_NAME.service"
+sudo systemctl enable $SERVICE_NAME.service
