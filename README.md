@@ -7,13 +7,10 @@ User interface animation   |  Client play illustration
 
 # The system
 
-## 1 x Raspberry Pi 3 (Server)
-- Websocket server that relays all incoming events to all other clients (python) 
-- Websocket client for gpio push-buttons interaction (python)
+- Raspberry PI 3
+- Websocket server that captures all gpio events and emits these to the client (python)
 - Web browser with websocket client (js) that shows the web interface 
 - Wooden casing
-
-## n x Raspberry Pi zero W (Clients)
 
 ![](img/ee.jpg)
 
@@ -24,13 +21,3 @@ Holes 1             |  Holes2
 - Websocket client for the gpio break beam sensors (python)
 - Wooden casing
 - 5 x IR break beam sensor
-
-# Installation
-
-## Server
-
-TODO
-
-## Client
-
-TODO
