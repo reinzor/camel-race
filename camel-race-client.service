@@ -1,9 +1,0 @@
-[Unit]
-Description=Camel race client
-
-[Install]
-WantedBy=multi-user.target
-
-[Service]
-Restart=on-abort
-#ExecStart= (This line will be appended by installer)

@@ -3,7 +3,7 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 sudo apt install python-pip
-sudo -H pip install websocket-server
+pip install flask-socketio
 
 # Copy the app
 SERVICE_NAME=camel-race-server
