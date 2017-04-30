@@ -10,14 +10,10 @@ User interface animation   |  Client play illustration
 - Raspberry PI 3
 - Websocket server that captures all gpio events and emits these to the client (python)
 - Web browser with websocket client (js) that shows the web interface 
-- Wooden casing
+- Server is connected to 5 player set-ups that consist of 5x break beam sensor to detect falling balls:
 
 ![](img/ee.jpg)
 
 Holes 1             |  Holes2
 :------------------:|:---------------------:
 ![](img/holes.jpg)  |  ![](img/holes2.jpeg)
-
-- Websocket client for the gpio break beam sensors (python)
-- Wooden casing
-- 5 x IR break beam sensor
