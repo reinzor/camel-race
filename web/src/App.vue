@@ -33,6 +33,7 @@
                     :aria-valuenow="player.score"
                     aria-valuemin="0"
                     :aria-valuemax="maxScore"></div>
+                    <span class="camel"></span>
                 </div>
               </div>
             </div>
@@ -178,6 +179,7 @@ export default {
 </script>
 
 <style>
+
 .player {
   padding-bottom: 20px;
   padding-top: 20px;
@@ -195,6 +197,20 @@ export default {
   opacity: 0;
   position: absolute;
   margin-left: -20px;
+}
+
+.progress-bar, .camel {
+  height: 50px;
+}
+
+.camel {
+  background: url('/static/camel.png') left center no-repeat;
+  animation: play .8s steps(12) infinite;
+  width: 75px;
+}
+
+@keyframes play {
+  100% { background-position: -900px; }
 }
 
 .fade-enter {
