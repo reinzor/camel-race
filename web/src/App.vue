@@ -4,17 +4,13 @@
         <div class="cover-container" id="app">
             <div class="masthead clearfix">
               <div class="inner">
-                <h3 class="masthead-brand">Kamelen Race!</h3>
-                <nav>
-                  <ul class="nav masthead-nav">
-                    <li><a href="#" @click="resetGame">Reset</a></li>
-                  </ul>
-                </nav>
+                <h3 class="masthead-brand" @click="resetGame">Kamelen Race!</h3>
               </div>
             </div>
             <div class="inner cover">
-              <h1 v-if="winner" class="cover-heading">{{winner.name}} wint! - {{minutes}}:{{seconds}}</h1>
-              <h1 v-else class="cover-heading">{{minutes}}:{{seconds}}</h1>
+              <h1 v-if="!active" class="cover-heading">Klaar voor de start?</h1>
+              <h1 v-if="!winner && active" class="cover-heading">{{minutes}}:{{seconds}}</h1>
+              <h1 v-if="winner && active" class="cover-heading">{{winner.name}} wint! - {{minutes}}:{{seconds}}</h1>
               <div v-for="(player, origin, idx) in players" class="player">
                 <transition name="fade" mode="out-in">
                   <div class="lastScore"
@@ -73,9 +69,9 @@ export default {
         doubleTapTime: 1000,
         count: 0,
         time: null,
-        resetGameCount: 1,
-        clearPlayersCount: 2
-      }
+        clearPlayersCount: 5
+      },
+      active: false
     }
   },
   sockets: {
@@ -96,7 +92,7 @@ export default {
         })
       }
       // If we do not have a winner, keep track of the points and score the event
-      if (!this.winner) {
+      if (!this.winner && this.active) {
         this.players[e.origin].score += e.numPoints
         this.players[e.origin].lastEvent = e
       }
@@ -136,7 +132,7 @@ export default {
   },
   methods: {
     checkAudio () {
-      if (this.winner && feelgoodAudio.paused) {
+      if (this.winner && feelgoodAudio.paused && this.active) {
         feelgoodAudio.currentTime = 0
         feelgoodAudio.play()
         derbyAudio.pause()
@@ -151,27 +147,32 @@ export default {
       return parseInt(parseFloat(score) / this.maxScore * 100)
     },
     resetGame () {
-      feelgoodAudio.pause()
-      derbyAudio.currentTime = 0
-      derbyAudio.play()
-      derbyAudio.addEventListener('ended', () => {
-        if (!this.winner) {
-          derbyAudio.play()
-        }
-      })
-      bellAudio.currentTime = 0
-      bellAudio.play()
-
       this.resetButton.time = new Date()
       this.resetButton.count += 1
       if (this.resetButton.count >= this.resetButton.clearPlayersCount) {
         this.players = {}
-      } else if (this.resetButton.count >= this.resetButton.resetGameCount) {
+      } else if (!this.active) {
+        feelgoodAudio.pause()
+        derbyAudio.currentTime = 0
+        derbyAudio.play()
+        derbyAudio.addEventListener('ended', () => {
+          if (!this.winner && this.active) {
+            derbyAudio.play()
+          }
+        })
+        bellAudio.currentTime = 0
+        bellAudio.play()
+
+        this.startTime = Math.trunc((new Date()).getTime() / 1000)
+        this.active = true
+      } else if (this.active) {
         for (let origin in this.players) {
           this.players[origin].score = 0
         }
-
-        this.startTime = Math.trunc((new Date()).getTime() / 1000)
+        derbyAudio.pause()
+        feelgoodAudio.pause()
+        bellAudio.pause()
+        this.active = false
       }
     }
   }
