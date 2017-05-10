@@ -4,7 +4,7 @@
         <div class="cover-container" id="app">
             <div class="masthead clearfix">
               <div class="inner">
-                <h3 class="masthead-brand">Camel Race!</h3>
+                <h3 class="masthead-brand">Kamelen Race!</h3>
                 <nav>
                   <ul class="nav masthead-nav">
                     <li><a href="#" @click="resetGame">Reset</a></li>
@@ -12,20 +12,15 @@
                 </nav>
               </div>
             </div>
-            <div v-if="winner" class="inner cover">
-              <h1 class="cover-heading">{{winner.name}} has won!</h1>
-              <p class="lead">
-                <a href="#" class="btn btn-lg btn-default" @click="resetGame">Restart game</a>
-              </p>
-            </div>
             <div class="inner cover">
-              <h1 class="cover-heading">{{minutes}}:{{seconds}}</h1>
+              <h1 v-if="winner" class="cover-heading">{{winner.name}} wint! - {{minutes}}:{{seconds}}</h1>
+              <h1 v-else class="cover-heading">{{minutes}}:{{seconds}}</h1>
               <div v-for="(player, origin, idx) in players" class="player">
                 <transition name="fade" mode="out-in">
                   <div class="lastScore"
                     :style="{color: getColor(idx)}"
                     :key="player.lastEvent.time"
-                    v-text="player.lastEvent.numPoints"></div>
+                    v-text="player.lastEvent.numPoints" v-if="player.lastEvent"></div>
                 </transition>
                 <div class="info">
                   <span class="name" v-text="player.name"></span>
@@ -43,7 +38,7 @@
             </div>
             <div class="mastfoot">
               <div class="inner">
-                <p>Camel race, by <a href="mailto:info@baasvanhorstaandemaas.nl">Baas van Horst aan de Maas</a></p>
+                <p>Kamelen race, <a href="mailto:info@baasvanhorstaandemaas.nl">Baas van Horst aan de Maas</a></p>
               </div>
             </div>
         </div>
@@ -58,18 +53,24 @@ function pad (n, width, z) {
   return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n
 }
 
+var bellAudio = new Audio('static/audio/bell.wav')
+bellAudio.pause()
+var derbyAudio = new Audio('static/audio/derby.wav')
+derbyAudio.pause()
+var feelgoodAudio = new Audio('static/audio/feelgood.wav')
+feelgoodAudio.pause()
+
 export default {
   name: 'app',
   data () {
     return {
-      message: 'Hello Vue!',
       players: {},
-      maxScore: 20,
+      maxScore: 3,
       startTime: Math.trunc((new Date()).getTime() / 1000),
       sinceStart: 0,
       resetButton: {
         doubleTapTime: 1000,
-        count: 0,
+        count: 20,
         time: null,
         resetGameCount: 1,
         clearPlayersCount: 2
@@ -89,7 +90,7 @@ export default {
       if (!(e.origin in this.players)) {
         this.$set(this.players, e.origin, {
           score: 0,
-          name: 'Player ' + (Object.keys(this.players).length + 1),
+          name: 'Speler ' + (Object.keys(this.players).length + 1),
           lastEvent: null
         })
       }
@@ -129,9 +130,17 @@ export default {
           this.resetButton.count = 0
         }
       }
+      this.checkAudio()
     }, 100)
   },
   methods: {
+    checkAudio () {
+      if (this.winner && feelgoodAudio.paused) {
+        feelgoodAudio.currentTime = 0
+        feelgoodAudio.play()
+        derbyAudio.pause()
+      }
+    },
     getColor (idx) {
       var index = idx % 5
       var colors = ['#5cb85c', '#5bc0de', '#f0ad4e', '#d9534f', '#0275d8']
@@ -141,6 +150,17 @@ export default {
       return parseInt(parseFloat(score) / this.maxScore * 100)
     },
     resetGame () {
+      feelgoodAudio.pause()
+      derbyAudio.currentTime = 0
+      derbyAudio.play()
+      derbyAudio.addEventListener('ended', () => {
+        if (!this.winner) {
+          derbyAudio.play()
+        }
+      })
+      bellAudio.currentTime = 0
+      bellAudio.play()
+
       this.resetButton.time = new Date()
       this.resetButton.count += 1
       if (this.resetButton.count >= this.resetButton.clearPlayersCount) {
@@ -149,6 +169,7 @@ export default {
         for (let origin in this.players) {
           this.players[origin].score = 0
         }
+
         this.startTime = Math.trunc((new Date()).getTime() / 1000)
       }
     }
