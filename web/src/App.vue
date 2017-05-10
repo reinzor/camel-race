@@ -65,12 +65,12 @@ export default {
   data () {
     return {
       players: {},
-      maxScore: 3,
+      maxScore: 20,
       startTime: Math.trunc((new Date()).getTime() / 1000),
       sinceStart: 0,
       resetButton: {
         doubleTapTime: 1000,
-        count: 20,
+        count: 0,
         time: null,
         resetGameCount: 1,
         clearPlayersCount: 2
