@@ -12,6 +12,8 @@ User interface animation   |  Client play illustration
 - Web browser with websocket client (js) that shows the web interface 
 - Server is connected to 5 player set-ups that consist of 5x break beam sensor to detect falling balls:
 
+https://www.adafruit.com/product/2167
+
 ![](img/ee.jpg)
 ![](img/detailed_ee.png)
 
