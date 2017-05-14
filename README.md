@@ -13,7 +13,7 @@ User interface animation   |  Client play illustration
 - Server is connected to 5 player set-ups that consist of 5x break beam sensor to detect falling balls:
 
 ![](img/ee.jpg)
-![](img/detailed_ee.jpg)
+![](img/detailed_ee.png)
 
 Holes 1             |  Holes2
 :------------------:|:---------------------:
